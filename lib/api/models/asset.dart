@@ -4,9 +4,12 @@ part 'asset.g.dart';
 
 @JsonSerializable()
 class Asset {
-  String id;
+  final String id;
+  final String symbol;
+  final String name;
+  final String slug;
 
-  Asset(this.id);
+  Asset(this.id, this.symbol, this.name, this.slug);
 
   factory Asset.fromJson(Map<String, dynamic> json) => _$AssetFromJson(json);
 
