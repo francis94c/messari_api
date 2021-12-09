@@ -16,7 +16,9 @@ class MessariAPI {
   static late final ExchangeRateClient _exchangeRateClient =
       ExchangeRateClient(Dio());
 
-  static final SplayTreeMap<String, double> _xRateMap =
+  static final SplayTreeMap<String, double> _cryptoXRateMap =
+      SplayTreeMap<String, double>();
+  static final SplayTreeMap<String, double> _fiatXRateMap =
       SplayTreeMap<String, double>();
 
   /// Get Crypto Asset.
@@ -26,7 +28,7 @@ class MessariAPI {
   /// Get Crypto Asset Metrics.
   static Future<AssetMetricsResponse> getMetrics(String assetId) async {
     AssetMetricsResponse response = await _assetsClient.getMetrics(assetId);
-    _xRateMap[response.assetMetric.slug] =
+    _cryptoXRateMap[response.assetMetric.slug] =
         response.assetMetric.marketData.priceUsd;
     return response;
   }
@@ -39,8 +41,8 @@ class MessariAPI {
   /// Returns the converted value in dollars.
   static Future<double> cryptoToDollars(String slug, double assetVal,
       {bool useCache = true}) async {
-    if (_xRateMap.containsKey(slug)) {
-      return _xRateMap[slug]! * assetVal;
+    if (useCache && _cryptoXRateMap.containsKey(slug)) {
+      return _cryptoXRateMap[slug]! * assetVal;
     } else {
       AssetMetricsResponse response = await getMetrics(slug);
       return response.assetMetric.marketData.priceUsd * assetVal;
@@ -53,6 +55,9 @@ class MessariAPI {
       {bool useCache = true}) async {
     double dollarVal =
         await cryptoToDollars(assetSlug, assetVal, useCache: useCache);
+    if (useCache && _cryptoXRateMap.containsKey(assetSlug + fiatCurrency)) {
+      return dollarVal * _cryptoXRateMap[assetSlug + fiatCurrency]!;
+    }
 
     ExchangeRateData response = await _exchangeRateClient.getRates(
         baseCurrency: "USD", outputCurrencies: fiatCurrency.toUpperCase());

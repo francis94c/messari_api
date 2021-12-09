@@ -1,7 +1,7 @@
 name: messari_api
 description: A new Flutter package project.
-version: 0.0.1
-homepage:
+version: 1.0.0-alpha.1
+repository: https://github.com/francis94c/messari_api
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -13,6 +13,7 @@ dependencies:
   
   retrofit: ^2.0.1
   json_annotation: ^4.3.0
+  dio: ^4.0.4
 
 dev_dependencies:
   flutter_test:
